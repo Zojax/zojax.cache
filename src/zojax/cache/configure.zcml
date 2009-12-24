@@ -1,0 +1,78 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+  xmlns:zojax="http://namespaces.zope.org/zojax"
+   i18n_domain="zojax.cache">
+
+  <zojax:configlet
+     title="Cache"
+     name="system.cache"
+     schema=".interfaces.ICacheConfiglet"
+     class=".configlet.CacheConfiglet"
+     description="Site caching configuration."
+     permission="zojax.Configure">
+    
+    <require
+       permission="zope.Public"
+       attributes="set query" />
+  </zojax:configlet>
+
+  <class class=".configlet.DefaultCacheConfiglet">
+    <allow attributes="query set" />
+  </class>
+
+  <subscriber handler=".default.beforeTraverseHandler" />
+
+  <subscriber handler=".default.endRequestHandler" />
+
+  <!-- ram cache -->
+  <class class=".ram.RAMCache">
+    <require
+       permission="zojax.Configure"
+       interface="zope.app.cache.interfaces.ram.IRAMCache" />
+  </class>
+
+  <!-- memcached cache -->
+  <class class=".memcached.MemcachedCache">
+    <require
+       permission="zojax.Configure"
+       set_schema=".interfaces.IMemcachedCache"
+       interface=".interfaces.IMemcachedCache" />
+  </class>
+
+  <!-- tags -->
+  <utility component=".tag.tagging" />
+
+  <class class=".tag.Tagging">
+    <allow interface=".interfaces.ITagging" />
+  </class>
+
+  <class class=".tag.Tag">
+    <allow interface=".interfaces.ITag" />
+  </class>
+
+  <class class=".tag.SiteTag">
+    <allow interface=".interfaces.ITag" />
+  </class>
+
+  <class class=".tag.ContextTag">
+    <allow interface=".interfaces.ITag" />
+  </class>
+
+  <!-- global keys -->
+  <class class=".default.LanguageKey">
+    <allow interface=".interfaces.IKey" />
+  </class>
+
+  <class class=".default.ServerKey">
+    <allow interface=".interfaces.IKey" />
+  </class>
+
+  <utility
+     name="cache.global.keys"
+     provides="zope.schema.interfaces.IVocabularyFactory"
+     component=".globalkey.GlobalKeysVocabulary" />
+
+  <!-- browser views -->
+  <include package=".browser" />
+
+</configure>

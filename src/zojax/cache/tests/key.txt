@@ -1,0 +1,151 @@
+=========
+Cache Key
+=========
+
+  >>> from zope import interface, event
+  >>> from zope.lifecycleevent import ObjectModifiedEvent
+  >>> from zope.location import Location
+  >>> from zope.component import getUtility
+  >>> from zope.app.security.interfaces import IAuthentication
+  >>> from zope.security.management import newInteraction, endInteraction
+  >>> from zope.app.component.interfaces import ISite
+  >>> from zope.app.component.hooks import getSite, setSite
+  >>> from zope.annotation.interfaces import IAttributeAnnotatable
+
+  >>> from zojax.cache import keys, interfaces, default
+
+  >>> class Content(Location):
+  ...     interface.implements(IAttributeAnnotatable)
+  ...
+  ...     def __init__(self, name, parent):
+  ...         self.__name__ = name
+  ...         self.__parent__ = parent
+
+  >>> class Context(object):
+  ...     def __init__(self, context):
+  ...         self.context = context
+
+  >>> class View(object):
+  ...     def __init__(self, context, request):
+  ...         self.context = context
+  ...         self.request = request
+
+  >>> from zope.publisher.browser import TestRequest
+
+  >>> request = TestRequest()
+  >>> principal = getUtility(IAuthentication).getPrincipal('zope.user')
+  >>> request.setPrincipal(principal)
+
+  >>> root = getRootFolder()
+  >>> setSite(root)
+  >>> sm = root.getSiteManager()
+
+  >>> class Participation:
+  ...     interaction = None
+  ...     def __init__(self, principal):
+  ...         self.principal = principal
+
+  >>> auth = sm.getUtility(IAuthentication)
+  >>> endInteraction()
+  >>> newInteraction(Participation(auth.getPrincipal('zope.user')))
+
+default content
+
+  >>> content11 = Content('content11', root)
+  >>> event.notify(ObjectModifiedEvent(content11))
+  >>> content111 = Content('content111', content11)
+
+  >>> content12 = Content('content12', root)
+  >>> content121 = Content('content121', content12)
+
+
+Default keys
+-------------
+
+  >>> default.serverKey(1, View(content11, None))
+  ()
+
+  >>> default.serverKey(1, View(content11, request))
+  {'request:SERVER_NAME': (u'', u'', 'http://127.0.0.1')}
+
+  >>> request.setApplicationServer('www.some.com', proto='http', port=888)
+  >>> default.serverKey(1, View(content11, request))
+  {'request:SERVER_NAME': (u'', u'', 'http://www.some.com:888')}
+
+  >>> from zope.i18n.interfaces import IModifiableUserPreferredLanguages
+  >>> default.languageKey(1, View(content11, request))
+  ()
+  >>> IModifiableUserPreferredLanguages(request).setPreferredLanguages(['en', 'ru'])
+  >>> default.languageKey(1, View(content11, request))
+  {'request:language': 'en'}
+
+
+We can't create global key with exsitent name
+
+  >>> serverKey = default.ServerKey('test', u'test', u'')
+
+  >>> serverKey = default.ServerKey('test', u'test', u'')
+  Traceback (most recent call last):
+  ...
+  ValueError: RequestKey "test" already registered.
+
+
+Keys
+----
+
+
+Path
+
+  >>> keys.Path(Context(None), content11)
+  {'path': u'/content11'}
+
+Principal
+
+  >>> keys.Principal(Context(None), View(content11, request))
+  {'principal': 'zope.user'}
+
+PrincipalAndContext
+
+  >>> keys.PrincipalAndContext(Context(None), View(content11, request))
+  {'context': u'/content11', 'principal': 'zope.user'}
+
+
+VisibleContext
+
+  >>> keys.VisibleContext(Context(None), View(content11, request))
+  {'context': u'/content11', 'principal': 'zope.user'}
+
+  >>> interface.alsoProvides(content11, interfaces.IVisibleContext)
+  >>> keys.VisibleContext(Context(None), View(content11, request))
+  {'context': u'/content11'}
+
+
+Context
+
+  >>> keys.Context(Context(None), View(content11, request))
+  {'context': u'/content11'}
+
+
+ContextModified
+
+  >>> keys.ContextModified(Context(None), View(content11, request))
+  {'modified': datetime.datetime(...), 'context': u'/content11'}
+
+
+Attributes
+
+  >>> keys.Attributes('__parent__', '__name__')(Context(None), View(content11, request))
+  {u'__name__': 'content11', u'__parent__': <...Folder ...>}
+
+
+PermissionsAndContext
+
+  >>> keys.PermissionsAndContext('zope.View', 'zojax.ModifyContent')(Context(None), View(content11, request))
+  {'context': u'/content11', 'permissions': (('zope.View', True), ('zojax.ModifyContent', False))}
+
+
+Cleanup
+-------
+
+  >>> endInteraction()
+  >>> setSite(None)

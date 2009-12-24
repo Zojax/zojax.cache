@@ -1,0 +1,60 @@
+=======
+CHANGES
+=======
+
+0.4.1 (2009-10-28)
+------------------
+
+- PermissionsAndContext key bugfix
+
+
+0.4.0 (2009-10-27)
+------------------
+
+- PermissionsAndContext key added
+
+- Keys tests added
+
+- Fixed serverKey so it uses getApplicationURL
+
+
+0.3.1 (2009-08-22)
+------------------
+
+- Check request in ServerKey
+
+- Do not inlude path information to Principal key
+
+
+0.3.0 (2009-08-17)
+------------------
+
+- Update template ui
+
+- Added 'Server name' global key
+
+- Allow pass callable object as objectId to 'cache' descriptor
+
+- Added default callable ids for pagelet, portlet, pageelement
+
+
+0.2.1 (2008-08-13)
+------------------
+
+- Update tests
+
+
+0.2.0 (2009-08-11)
+------------------
+
+- Use thread local data for cache
+
+- Cleanup cache variable on IEndRequestEvent
+
+- Added helper functions setUpCache,tearDownCache for testing
+
+
+0.1.0 (2009-07-14)
+------------------
+
+- Initial release.

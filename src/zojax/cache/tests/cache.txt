@@ -1,0 +1,68 @@
+==================
+'cache' descriptor
+==================
+
+  >>> from zojax.cache import configlet
+  >>> from zojax.cache.view import cache
+  >>> from zojax.cache.interfaces import DoNotCache
+  >>> from zojax.cache.default import localData, defaultCacheConfiglet
+
+  >>> localData.cache = defaultCacheConfiglet
+
+  >>> def genKey(objectId, instance, *args, **kw):
+  ...     return (('arguments', tuple(args)),)
+
+  >>> def noCache(objectId, instance, *args, **kw):
+  ...     raise DoNotCache()
+
+  >>> def genObjectId(instance):
+  ...     return 'test.object'
+
+  >>> class TestView(object):
+  ...     
+  ...     request = None
+  ...     context = None
+  ...     
+  ...     @cache('test.view', genKey)
+  ...     def render(self, *args, **kw):
+  ...         print 'Render View'
+  ...         return 'View Content'
+  ...     
+  ...     @cache('test.none', genKey)
+  ...     def renderNone(self, *args, **kw):
+  ...         return None
+  ...     
+  ...     @cache(genObjectId, noCache)
+  ...     def renderNoCache(self, *args, **kw):
+  ...         print 'Render NoCache'
+  ...         return 'View NoCache'
+
+  >>> testView = TestView()
+  >>> print testView.render()
+  Render View
+  View Content
+
+  >>> print testView.render()
+  View Content
+
+  >>> print testView.render('test')
+  Render View
+  View Content
+
+  >>> print testView.render('test')
+  View Content
+
+  >>> print testView.renderNone()
+  None
+
+  >>> print testView.renderNone()
+  None
+
+  >>> print testView.renderNoCache()
+  Render NoCache
+  View NoCache
+
+  >>> print testView.renderNoCache()
+  Render NoCache
+  View NoCache
+
