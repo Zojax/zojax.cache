@@ -1,0 +1,104 @@
+========
+Time Key
+========
+
+  >>> import time
+  >>> from zojax.cache import timekey
+
+  >>> currentTime = 0.0
+  >>> originalTime = time.time
+  >>> originalLocaltime = time.localtime
+
+  >>> def localtimeFunction(value=None):
+  ...     if value is not None:
+  ...         return originalLocaltime(value)
+  ...     return currentTime
+
+  >>> time.localtime = localtimeFunction
+
+  >>> timeKey = timekey.TimeKey(minutes=timekey.each5minutes)
+
+  >>> currentTime = (2009,1,1, 1, 0, 0,0,0,0)
+  >>> originalLocaltime(timeKey()['time'])[:5]
+  (2009, 1, 1, 1, 0)
+
+  >>> currentTime = (2009,1,1, 1, 3, 0,0,0,0)
+  >>> originalLocaltime(timeKey()['time'])[:5]
+  (2009, 1, 1, 1, 0)
+
+  >>> currentTime = (2009,1,1, 1, 8, 0,0,0,0)
+  >>> originalLocaltime(timeKey()['time'])[:5]
+  (2009, 1, 1, 1, 5)
+
+  >>> timeKey = timekey.TimeKey(hours=timekey.each4hours)
+
+  >>> currentTime = (2009,1,1, 0, 3, 0,0,0,0)
+  >>> originalLocaltime(timeKey()['time'])[:5]
+  (2009, 1, 1, 0, 0)
+
+  >>> currentTime = (2009,1,1, 2, 3, 0,0,0,0)
+  >>> originalLocaltime(timeKey()['time'])[:5]
+  (2009, 1, 1, 0, 0)
+
+  >>> currentTime = (2009,1,1, 6, 3, 0,0,0,0)
+  >>> originalLocaltime(timeKey()['time'])[:5]
+  (2009, 1, 1, 4, 0)
+
+
+Tag Time Key
+============
+Time key that uses tag as base for generated value
+
+  >>> class Tag(object):
+  ...     def __init__(self, name='tag'):
+  ...         self.name = name
+  ...         self.value = None
+  ...         
+  ...     def query(self, context=None, default=None):
+  ...         return self.value
+
+  >>> class Context(object):
+  ...     def __init__(self, context):
+  ...         self.context = context
+
+  >>> currTime = 0.0
+  >>> def timeFunction():
+  ...     return currTime
+
+  >>> time.time = timeFunction
+
+  >>> simpleTag = Tag()
+  >>> timeKey = timekey.TagTimeKey(simpleTag, timekey.each5minutes)
+
+Tag is empty
+
+  >>> timeKey('', Context(None))
+  ()
+
+Tag with time withing timeKey time range, time key return it's ranged value.
+
+  >>> currTime = time.mktime((2009,1,1, 1, 4, 0,0,0,0))
+  >>> simpleTag.value = time.mktime((2009,1,1, 1, 3, 0,0,0,0))
+
+  >>> originalLocaltime(timeKey('', Context(None))['tagtime:tag'])[:5]
+  (2009, 1, 1, 1, 0)
+
+  >>> currTime = time.mktime((2009,1,1, 2, 10, 0,0,0,0))
+  >>> simpleTag.value = time.mktime((2009,1,1, 1, 59, 0,0,0,0))
+
+  >>> originalLocaltime(timeKey('', Context(None))['tagtime:tag'])[:5]
+  (2009, 1, 1, 2, 0)
+
+if tag value is lower that ranged value, time key return ranged value
+for tag value, it doesn't matter what time is it now
+
+  >>> currTime = time.mktime((2010,1,1, 1, 4, 0,0,0,0))
+  >>> simpleTag.value = time.mktime((2009,1,1, 1, 3, 0,0,0,0))
+  >>> originalLocaltime(timeKey('', Context(None))['tagtime:tag'])[:5]
+  (2009, 1, 1, 1, 5)
+
+
+Cleanup
+
+  >>> time.time = originalTime
+  >>> time.localtime = originalLocaltime

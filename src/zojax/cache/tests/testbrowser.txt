@@ -1,0 +1,136 @@
+===============
+Cache Configlet
+===============
+
+  >>> from zope import component, interface
+  >>> from zope.interface.verify import verifyObject
+  >>> from zope.app.component.hooks import getSite, setSite
+  >>> from zope.testbrowser.testing import Browser
+  >>> from zojax.cache.interfaces import ICacheConfiglet
+  >>> from zojax.cache import default
+  >>> from zojax.memcached.interfaces import IMemcachedConfiglet
+
+  >>> root = getRootFolder()
+  >>> setSite(root)
+  >>> sm = root.getSiteManager()
+
+  >>> util = sm.getUtility(ICacheConfiglet)
+  >>> sm.getUtility(IMemcachedConfiglet).enabled = True
+
+  >>> actor = Browser()
+  >>> actor.addHeader("Authorization", "Basic mgr:mgrpw")
+  >>> actor.handleErrors = False
+
+  >>> actor.open('http://localhost/settings/')
+  >>> actor.getLink('Cache').click()
+  >>> actor.getControl(name="configlet.widgets.enabled:list").value = ['true']
+  >>> actor.getControl(name="configlet.widgets.cachetype:list").value = ['ram']
+  >>> actor.getControl('Save').click()
+
+  >>> util.enabled, util.cachetype
+  (True, u'ram')
+
+  >>> default.beforeTraverseHandler(root, None)
+  >>> default.localData.cache
+  <zojax.cache.ram.RAMCache object ...>
+
+  >>> actor.getControl(name="configlet.widgets.cachetype:list").value = ['memcached']
+  >>> actor.getControl('Save').click()
+
+  >>> default.beforeTraverseHandler(root, None)
+  >>> default.localData.cache
+  <zojax.cache.memcached.MemcachedCache object ...>
+
+  >>> actor.getControl(name="configlet.widgets.enabled:list").value = ['false']
+  >>> actor.getControl('Save').click()
+
+  >>> default.beforeTraverseHandler(root, None)
+ >>> default.localData.cache
+  <zojax.cache.configlet.NoCache ...>
+
+  >>> actor.getControl(name="configlet.widgets.enabled:list").value = ['true']
+  >>> actor.getControl(name="configlet.widgets.cachetype:list").value = ['ram']
+  >>> actor.getControl('Save').click()
+  >>> actor.reload()
+
+  >>> actor.getLink('RAM Cache Configuration').click()
+  >>> actor.getControl('Maximum cached entries').value = '2000'
+  >>> actor.getControl('Save').click()
+  >>> 'Data successfully updated.' in actor.contents
+  True
+
+  >>> actor.getLink('RAM Cache Statistics').click()
+  >>> print actor.contents
+  <html>
+  ...
+  <table class="z-table">
+    <thead>
+      <th></th>
+      <th>Object</th>
+      <th>Hits</th>
+      <th>Misses</th>
+      <th>Size, bytes</th>
+      <th>Entries</th>
+      ...
+      <tr class="odd">
+        <td><input type="checkbox" name="objectIds:list" value="test.page" /></td>
+        <td>test.page</td>
+        <td>6</td>
+        <td>1</td>
+        <td>...</td>
+        <td>1</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>...</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  ...
+  </html>
+
+  >>> actor.getControl(name="objectIds:list").value = ['test.page']
+  >>> actor.getControl(name="ram.invalidate").click()
+
+  >>> print actor.contents
+  <html>
+  ...
+  ...Cache data has been invalidated...
+  ...
+  </html>
+
+  >>> 'test.page' not in actor.contents
+  True
+
+  >>> actor.getLink('Configure').click()
+  >>> actor.getControl(
+  ...     name='configlet.widgets.globalkeys:list').value = ['language']
+  >>> actor.getControl('Request vars').value = 'PATH_INFO'
+  >>> actor.getControl('Save').click()
+
+  >>> 'Data successfully updated.' in actor.contents
+  True
+
+  >>> actor.reload()
+
+tests
+
+  >>> util.set(('test data',), 'test.object', {})
+  >>> util.query('test.object', {})
+  ('test data',)
+
+  >>> util.enabled = False
+  >>> print util.query('test.object', {})
+  None
+
+
+cleanup
+
+  >>> sync()
+  >>> setSite(None)

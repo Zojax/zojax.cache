@@ -1,0 +1,144 @@
+=========
+Cache Tag
+=========
+
+  >>> from zope import interface
+  >>> from zope.location import Location
+  >>> from zope.component import getUtility
+  >>> from zope.app.component.interfaces import ISite
+  >>> from zope.app.component.hooks import getSite, setSite
+
+  >>> from zojax.cache import tag
+  >>> from zojax.cache.interfaces import ITag, ITagging
+
+  >>> currentTime = 1.0
+  >>> def genValue():
+  ...     return currentTime
+
+  >>> class Content(Location):
+  ...     def __init__(self, name, parent):
+  ...         self.__name__ = name
+  ...         self.__parent__ = parent
+
+  >>> class Context(object):
+  ...     def __init__(self, context):
+  ...         self.context = context
+
+
+  >>> root = getRootFolder()
+  >>> setSite(root)
+
+default content
+
+  >>> content11 = Content('content11', root)
+  >>> content111 = Content('content111', content11)
+
+  >>> content12 = Content('content12', root)
+  >>> content121 = Content('content121', content12)
+
+
+Tag
+---
+Simple tag, tag on single context
+
+  >>> simpleTag = tag.Tag('simpleTag', genValue)
+
+  >>> simpleTag is getUtility(ITag, 'simpleTag')
+  True
+  >>> tag.Tag('simpleTag', genValue)
+  Traceback (most recent call last):
+  ...
+  ValueError: Tag "simpleTag" already registered.
+
+  >>> print simpleTag.query(content111)
+  None
+  >>> print simpleTag('', Context(content111))
+  ()
+
+  >>> simpleTag.update(content111)
+
+  >>> print simpleTag.query(content111)
+  1.0
+  >>> print simpleTag('', Context(content111))
+  (('tag:simpleTag', 1.0),)
+
+  >>> print simpleTag('', Context(content11))
+  ()
+
+
+SiteTag
+-------
+Always use ISite for tag context
+
+  >>> siteTag = tag.SiteTag('siteTag', genValue)
+
+  >>> print siteTag.query(root)
+  None
+  >>> print siteTag('', Context(root))
+  ()
+  >>> print siteTag.query(content121)
+  None
+
+  >>> siteTag.update(content111)
+  >>> siteTag('', Context(content111))
+  (('tag:siteTag', 1.0),)
+  >>> siteTag('', Context(content121))
+  (('tag:siteTag', 1.0),)
+  >>> siteTag('', Context(root))
+  (('tag:siteTag', 1.0),)
+
+  >>> currentTime = 2.0
+
+  >>> siteTag.update(root)
+  >>> siteTag('', Context(content111))
+  (('tag:siteTag', 2.0),)
+
+
+Context Tag
+-----------
+Return tag for current context, update tag in all context parents
+
+  >>> contextTag = tag.ContextTag('contextTag', genValue)
+
+  >>> print contextTag.query(content111)
+  None
+
+  >>> contextTag.update(content111)
+  >>> contextTag('', Context(content111))
+  (('tag:contextTag', 2.0),)
+  >>> contextTag('', Context(content11))
+  (('tag:contextTag', 2.0),)
+  >>> contextTag('', Context(root))
+  (('tag:contextTag', 2.0),)
+  >>> contextTag('', Context(content12))
+  ()
+
+  >>> currentTime = 3.0  
+  >>> contextTag.update(content12)
+  >>> contextTag('', Context(content12))
+  (('tag:contextTag', 3.0),)
+  >>> contextTag('', Context(root))
+  (('tag:contextTag', 3.0),)
+  >>> contextTag('', Context(content11))
+  (('tag:contextTag', 2.0),)
+
+
+ITagging
+--------
+
+  >>> tagging = getUtility(ITagging)
+
+  >>> tagging.query('contextTag', root)
+  3.0
+  
+  >>> tagging.update('contextTag', 4.0)
+  >>> tagging.query('contextTag', root)
+  3.0
+  >>> tagging.query('contextTag')
+  4.0
+
+
+cleanup
+
+  >>> setSite(None)
+

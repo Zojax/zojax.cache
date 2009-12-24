@@ -1,0 +1,34 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   xmlns:browser="http://namespaces.zope.org/browser"
+   i18n_domain="zojax.cache">
+
+ <zojax:pagelet
+     name="index.html"
+     for="..interfaces.ICacheConfiglet"
+     class="zojax.controlpanel.browser.wizard.ConfigletEditWizard"
+     permission="zojax.Configure" />
+
+  <!-- ram cache -->
+  <zojax:pagelet
+     name="ramcache"
+     type="wizard.step"
+     title="RAM Cache Configuration"
+     label="RAM Cache Configuration"
+     for="..interfaces.ICacheConfiglet
+	  zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
+     class=".ram.RAMCacheEdit"
+     weight="200" />
+
+  <zojax:pagelet
+     name="ramcachestats"
+     type="wizard.step"
+     title="RAM Cache Statistics"
+     for="..interfaces.ICacheConfiglet
+	  zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
+     template="ramstats.pt"
+     class=".ram.RAMCacheStats"
+     weight="300" />
+
+</configure>
