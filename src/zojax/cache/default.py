@@ -20,6 +20,7 @@ from threading import local
 from zope import component
 from zope.component import getUtility
 from zope.i18n.interfaces import IUserPreferredLanguages
+from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.app.component.interfaces import ISite
 from zope.app.publication.interfaces import \
     IBeforeTraverseEvent, IEndRequestEvent
@@ -100,7 +101,7 @@ class ServerKey(GlobalKey):
 
     def __call__(self, objectId, instance, *args, **kw):
         request = instance.request
-        if request is not None:
+        if IBrowserRequest.providedBy(request):
             return {'request:SERVER_NAME':
                         (request.get('SERVER_NAME', u''),
                          request.get('SERVER_PORT', u''),
