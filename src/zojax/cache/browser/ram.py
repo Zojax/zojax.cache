@@ -76,6 +76,11 @@ class RAMCacheStats(WizardStep):
                 IStatusMessage(request).add(
                     u'Cache data has been invalidated.')
 
+        if 'ram.invalidateall' in request:
+            ram.invalidateAll()
+            IStatusMessage(request).add(
+                    u'Cache data has been invalidated.')
+
         self.stats = ram.getStatistics()
 
         size = 0
