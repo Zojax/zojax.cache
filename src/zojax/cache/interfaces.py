@@ -69,7 +69,18 @@ class ICacheConfiglet(interface.Interface):
         """ set cache data """
 
 
-class IMemcachedCache(ICache):
+class IBaseCache(ICache):
+    
+    def getStatistics():
+        """Reports on the contents of a cache.
+
+        The returned value is a sequence of dictionaries with the
+        following keys:
+
+          `path`, `hits`, `misses`, `size`, `entries`
+        """
+
+class IMemcachedCache(ICache, IBaseCache):
 
     prefix = schema.TextLine(
         title = u'Prefix',

@@ -30,5 +30,27 @@
      template="ramstats.pt"
      class=".ram.RAMCacheStats"
      weight="300" />
+     
+  <!-- memcached -->
+  <zojax:pagelet
+     name="memcached"
+     type="wizard.step"
+     title="Memcached Cache Configuration"
+     label="Memecached Cache Configuration"
+     for="..interfaces.ICacheConfiglet
+      zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
+     class=".memcached.MemcachedCacheEdit"
+     weight="200" />
+
+  <zojax:pagelet
+     name="memcachedcachestats"
+     type="wizard.step"
+     title="Memcached Cache Statistics"
+     for="..interfaces.ICacheConfiglet
+      zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
+     template="memcachedstats.pt"
+     class=".memcached.MemcachedCacheStats"
+     weight="300" />
+  
 
 </configure>

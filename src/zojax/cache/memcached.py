@@ -48,3 +48,6 @@ class MemcachedCache(Persistent):
 
     def set(self, data, ob, key=None):
         self.client.set(data, (self.prefix,ob), ns=key)
+
+    def getStatistics(self):
+        return []
