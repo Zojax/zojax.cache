@@ -38,9 +38,9 @@
     </table>
     <div class="z-form-controls">
       <hr />
-      <input type="submit" class="z-form-removebutton"
+      <input type="submit" class="z-form-removebutton" i18n:attributes="value"
        style="width: auto" value="Invalidate selected" name="ram.invalidate" />
-      <input type="submit" class="z-form-removebutton"
+      <input type="submit" class="z-form-removebutton" i18n:attributes="value"
        style="width: auto" value="Invalidate all" name="ram.invalidateall" />
     </div>
   </tal:block>
