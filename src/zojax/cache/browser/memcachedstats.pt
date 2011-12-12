@@ -1,0 +1,51 @@
+<h2 i18n:translate="">Memcached Cache Statistics</h2>
+<div class="z-page-description"></div>
+
+<div class="z-table-container" tal:define="stats view/stats">
+  <tal:block tal:condition="stats">
+    <table class="z-table">
+      <thead>
+  <th></th>
+  <th i18n:translate="">Object</th>
+  <th i18n:translate="">Hits</th>
+  <th i18n:translate="">Misses</th>
+  <th i18n:translate="">Size, bytes</th>
+  <th i18n:translate="">Entries</th>
+      </thead>
+      <tbody>
+  <tr tal:repeat="data stats"
+      tal:attributes="class python:repeat['data'].odd()
+          and 'even' or 'odd'">
+    <td><input type="checkbox" name="objectIds:list"
+         tal:attributes="value data/path" /></td>
+    <td tal:content="data/path"></td>
+    <td tal:content="data/hits"></td>
+    <td tal:content="data/misses"></td>
+    <td tal:content="data/size"></td>
+    <td tal:content="data/entries"></td>
+  </tr>
+      </tbody>
+      <tfoot>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td tal:content="view/size"></td>
+    <td></td>
+  </tr>
+      </tfoot>
+    </table>
+  </tal:block>
+  <tal:block condition="not:stats">
+    There are no any statistics.
+  </tal:block>
+    <div class="z-form-controls">
+      <hr />
+      <input type="submit" class="z-form-removebutton" i18n:attributes="value"
+       style="width: auto" value="Invalidate selected" name="memcached.invalidate" />
+      <input type="submit" class="z-form-removebutton" i18n:attributes="value"
+       style="width: auto" value="Invalidate all" name="memcached.invalidateall" />
+    </div>
+
+</div>
