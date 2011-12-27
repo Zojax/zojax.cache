@@ -19,7 +19,8 @@
      for="..interfaces.ICacheConfiglet
 	  zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
      class=".ram.RAMCacheEdit"
-     weight="200" />
+     weight="200"
+     permission="zojax.Configure" />
 
   <zojax:pagelet
      name="ramcachestats"
@@ -29,7 +30,8 @@
 	  zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
      template="ramstats.pt"
      class=".ram.RAMCacheStats"
-     weight="300" />
+     weight="300"
+     permission="zojax.Configure" />
      
   <!-- memcached -->
   <zojax:pagelet
@@ -40,7 +42,8 @@
      for="..interfaces.ICacheConfiglet
       zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
      class=".memcached.MemcachedCacheEdit"
-     weight="200" />
+     weight="200"
+     permission="zojax.Configure" />
 
   <zojax:pagelet
      name="memcachedcachestats"
@@ -50,7 +53,8 @@
       zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
      template="memcachedstats.pt"
      class=".memcached.MemcachedCacheStats"
-     weight="300" />
+     weight="300"
+     permission="zojax.Configure" />
   
 
 </configure>
