@@ -21,6 +21,7 @@ from zojax.layoutform import Fields
 from zojax.wizard.interfaces import ISaveable
 from zojax.wizard.step import WizardStep, WizardStepForm
 from zojax.statusmessage.interfaces import IStatusMessage
+from zope.security.proxy import removeSecurityProxy
 
 
 class IMemcachedCache(interface.Interface):
@@ -46,8 +47,8 @@ class MemcachedCacheStats(WizardStep):
 
     def update(self):
         request = self.request
-        memcached = self.context.memcached
-
+        memcached = removeSecurityProxy(self.context.memcached)
+        
         if 'memcached.invalidate' in request:
             changed = False
             for oid in request.get('objectIds', ()):
