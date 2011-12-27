@@ -33,10 +33,10 @@ class MemcachedCacheEdit(WizardStepForm):
     fields = Fields(IMemcachedCache)
 
     def getContent(self):
-        return self.context.memcached
+        return {}
 
     def applyChanges(self, data):
-        self.context.memcached.update(**data)
+        removeSecurityProxy(self.context.memcached).update(**data)
         return True
 
     def isAvailable(self):
