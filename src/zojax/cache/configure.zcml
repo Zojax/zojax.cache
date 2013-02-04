@@ -71,6 +71,10 @@
     <allow interface=".interfaces.IKey" />
   </class>
 
+  <class class=".default.OnlineUsersKey">
+    <allow interface=".interfaces.IKey" />
+  </class>
+
   <utility
      name="cache.global.keys"
      provides="zope.schema.interfaces.IVocabularyFactory"

@@ -112,3 +112,18 @@ class ServerKey(GlobalKey):
 serverKey = ServerKey(
     'server', u'Server name',
     u'This key usefull when site accessed with different urls.')
+
+
+class OnlineUsersKey(GlobalKey):
+
+    def __init__(self, name, title=u'', description=u''):
+        self.users = None
+        GlobalKey.__init__(self, name, title, description)
+
+    def __call__(self, objectId, instance, *args, **kw):
+        return ''
+
+
+onlineUsersKey = OnlineUsersKey(
+    'users', u'Online users',
+    u'Should be turned on for user and page sratistics')
