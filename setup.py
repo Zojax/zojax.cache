@@ -24,46 +24,53 @@ def read(*rnames):
 version='0'
 
 
-setup(name = 'zojax.cache',
-      version = version,
-      author = 'Nikolay Kim',
-      author_email = 'fafhrd91@gmail.com',
-      description = "Cache system for zojax",
-      long_description = (
-        'Detailed Documentation\n' +
-        '======================\n'
-        + '\n\n' +
-        read('CHANGES.txt')
-        ),
+setup(name='zojax.cache',
+      version=version,
+      author='Nikolay Kim',
+      author_email='fafhrd91@gmail.com',
+      description="Cache system for zojax",
+      long_description=(
+          'Detailed Documentation\n' +
+          '======================\n'
+          + '\n\n' +
+          read('CHANGES.txt')
+      ),
       classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Zope Public License',
-        'Programming Language :: Python',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Topic :: Internet :: WWW/HTTP',
-        'Framework :: Zope3'],
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: Web Environment',
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: Zope Public License',
+          'Programming Language :: Python',
+          'Natural Language :: English',
+          'Operating System :: OS Independent',
+          'Topic :: Internet :: WWW/HTTP',
+          'Framework :: Zope3'],
       url='http://zojax.net/',
       license='ZPL 2.1',
       packages=find_packages('src'),
-      package_dir = {'':'src'},
+      package_dir={'': 'src'},
       namespace_packages=['zojax'],
-      install_requires = ['setuptools', 'rwproperty',
-                          'zope.schema',
-                          'zope.component',
-                          'zope.interface',
-                          'zope.app.cache',
-                          'zojax.memcached',
-                          'zojax.controlpanel',
-                          'zojax.wizard',
-                          'zojax.widget.radio',
-                          'zojax.widget.checkbox',
-                          ],
-      extras_require = dict(test=['zojax.autoinclude',
-                                  'zojax.controlpanel [test]',
-                                  'zojax.memcached',]),
-      include_package_data = True,
-      zip_safe = False
-      )
+      install_requires=['setuptools', 'rwproperty',
+                        'zope.schema',
+                        'zope.component',
+                        'zope.interface',
+                        'zope.app.cache',
+                        'zojax.memcached',
+                        'zojax.controlpanel',
+                        'zojax.wizard',
+                        'zojax.widget.radio',
+                        'zojax.widget.checkbox',
+      ],
+      extras_require=dict(test=['zope.app.testing',
+                                'zope.app.zcmlfiles',
+                                'zojax.autoinclude',
+                                'zojax.memcached',
+                                'zope.securitypolicy',
+                                'zope.testing',
+                                'zope.testbrowser',
+                                'zojax.content.browser',
+                                'zojax.controlpanel [test]',
+      ]),
+      include_package_data=True,
+      zip_safe=False
+)
